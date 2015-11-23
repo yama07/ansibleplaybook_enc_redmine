@@ -1,0 +1,4 @@
+---
+# 共通で使用するツール
+common_tools:
+  - { name: "@Development tools", state: latest }
