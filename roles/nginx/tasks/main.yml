@@ -1,0 +1,14 @@
+---
+# nginxがインストールされている
+- name: Ensure nginx repository is installed
+  yum: name={{ nginx_repository }} state=installed
+- name: Ensure nginx is installed
+  yum: name=nginx state=latest
+
+# nginxが自動起動設定済み
+- name: Ensure nginx service is enable
+  service: name=nginx enabled=yes
+
+# nginxが起動済み
+- name: Ensure nginx service is started
+  service: name=nginx state=started

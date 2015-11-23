@@ -1,0 +1,8 @@
+---
+# nginxを起動
+- name: Start nginx
+  service: name=nginx state=started
+
+# nginxを再起動
+- name: Restart nginx
+  service: name=nginx state=restarted
