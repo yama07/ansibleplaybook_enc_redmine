@@ -15,18 +15,12 @@
 # Unicorn設定ファイル配置済み
 - name: Ensure unicorn conf is set
   template: src=redmine/config/unicorn.rb.j2 dest="{{ redmine_prefix }}/config/unicorn.rb" backup=yes
+  notify: Restart Redmine
 
 # Rails設定ファイル配置済み
 - name: Ensure rails conf is set
   template: src=redmine/config.ru.j2 dest="{{ redmine_prefix }}/config.ru" backup=yes
-
-# Unicornドキュメントルートディレクトリが存在している
-- name: Ensure Redmine document root directory exists
-  file: path={{ unicorn_document_root }} state=directory
-
-# Redmine公開ディレクトリへのシンボリックリンクがドキュメントルート内に存在する
-- name: Ensure Redmine public directory link exists
-  file: src={{ redmine_prefix }}/public dest={{ unicorn_document_root }}/redmine state=link
+  notify: Restart Redmine
 
 # Unicorn起動グループ/ユーザが存在している
 - name: Ensure Unicorn invorking group exists
@@ -37,7 +31,8 @@
 
 # nginx用Unicorn設定ファイル配置済み
 - name: Ensure nginx-unicorn conf is set
-  template: src=nginx/redmine.j2 dest={{ nginx_conf }}/conf.d/redmine
+  template: src=nginx/Redmine.conf.j2 dest={{ nginx_conf }}/conf.d/Redmine.conf
+  notify: Restart nginx
 
 # Redmineのファイル領域のオーナー/グループがUnicorn起動ユーザ/グループである
 - name: Ensure Redmine directory owner/group is unicorn invoking user/group
@@ -73,3 +68,7 @@
 # Unicorn自動起動設定済み
 - name: Ensure unicorn is enable
   service: name=redmine enabled=yes
+
+# Unicorn起動済み
+- name: Ensure unicorn is started
+  service: name=redmine state=started

@@ -61,9 +61,6 @@ unicorn_invoking: {
 # Unicorn ワーカープロセス数
 unicorn_worker_processes: 2
 
-# Unicornドキュメントルート
-unicorn_document_root: /var/www
-
 # Unicornサーバ名
 unicorn_server_name: "{{ ansible_hostname }}"
 

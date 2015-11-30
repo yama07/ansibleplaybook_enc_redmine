@@ -1,11 +1,11 @@
 upstream redmine {
-  server unix:///{{ redmine_prefix }}/tmp/sockets/unicorn.sock fail_timeout=0;
+  server unix:{{ redmine_prefix }}/tmp/sockets/unicorn.sock fail_timeout=0;
 }
 
 server {
   listen 80;
   server_name {{ unicorn_server_name }};
-  root {{ unicorn_document_root }};
+  root {{ redmine_prefix }}/public;
 
   client_max_body_size 5M;
 
@@ -14,7 +14,6 @@ server {
   }
 
   location @redmine{
-    #error_log {{ unicorn_document_root }}/redmine/log/error.log;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;

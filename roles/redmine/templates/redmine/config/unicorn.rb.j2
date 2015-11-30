@@ -9,6 +9,8 @@ stdout_path File.expand_path('log/unicorn.stdout.log', ENV['RAILS_ROOT'])
 
 preload_app true
 
+user $unicorn_user, $unicorn_group
+
 before_fork do |server, worker|
   defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
 
@@ -23,23 +25,4 @@ end
 
 after_fork do |server, worker|
   defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
-
-  begin
-    uid, gid = Process.euid, Process.egid
-    user, group = $unicorn_user, $unicorn_group
-    target_uid = Etc.getpwnam(user).uid
-    target_gid = Etc.getgrnam(group).gid
-    worker.tmp.chown(target_uid, target_gid)
-    if uid != target_uid or gid != target_gid
-      Process.initgroups(user, target_gid)
-      Process::GID.change_privilege(target_gid)
-      Process::UID.change_privilege(target_uid)
-    end
-  rescue
-    if RAILS_ENV = "development"
-      STDERR.puts "could not change user, oh well"
-    else
-      raise e
-    end
-  end
 end
