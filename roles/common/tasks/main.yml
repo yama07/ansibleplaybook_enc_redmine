@@ -3,3 +3,7 @@
 - name: Ensure tools are installed
   yum: name="{{ item.name }}" state={{ item.state }}
   with_items: common_tools
+
+# EPELレポジトリが登録されている
+- name: Ensure EPEL repository is added
+  yum: name={{ common_epel_repository }} state=installed disable_gpg_check=yes

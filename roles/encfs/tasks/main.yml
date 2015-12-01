@@ -1,0 +1,25 @@
+---
+# EncFSビルドに必要なツールがインストールされている
+- name: Ensure EncFS build tools are installed
+  yum: name={{ item.name }} state={{ item.state }}
+  with_items: encfs_build_tools
+
+# EncFSソースダウンロード済み
+- name: Ensure EncFS src exist
+  get_url: url={{ encfs_uri }} dest={{ encfs_src_prefix }}
+
+# EncFSソース解凍済み
+- name: Ensure EncFS src is unarchived
+  shell: tar xvfz encfs-{{ encfs_version }}.tar.gz
+  args:
+    chdir: "{{ encfs_src_prefix }}"
+    creates: "{{ encfs_src_prefix }}/encfs-{{ encfs_version }}"
+
+# EncFSインストール済み
+- name: Ensure EncFS is installed
+  shell: autoreconf -if &&
+    CFLAGS=-I{{ gettext_prefix}}/include LDFLAGS=-L{{ gettext_prefix }}/lib ./configure &&
+    make && make install
+  args:
+    chdir: "{{ encfs_src_prefix }}/encfs-{{ encfs_version }}"
+    creates: /usr/local/bin/encfs
