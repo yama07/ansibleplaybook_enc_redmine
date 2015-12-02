@@ -1,4 +1,9 @@
 ---
+# Rubyビルドに必要なツールがインストールされている
+- name: Ensure Ruby build tools are installed
+  yum: name={{ item.name }} state={{ item.state }}
+  with_items: ruby_build_tools
+
 # rbyenvがインストールされている
 - name: Ensure rbenv is installed
   git: repo={{ ruby_rbenv.uri }} version={{ ruby_rbenv.version }}
