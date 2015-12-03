@@ -6,4 +6,5 @@
 
 # EPELレポジトリが登録されている
 - name: Ensure EPEL repository is added
-  yum: name={{ common_epel_repository }} state=installed disable_gpg_check=yes
+  yum: name={{ common_epel_repository[ansible_distribution_major_version] }}
+    state=installed disable_gpg_check=yes

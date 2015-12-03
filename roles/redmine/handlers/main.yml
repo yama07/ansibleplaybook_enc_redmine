@@ -5,3 +5,10 @@
 # Redmineを再起動
 - name: Restart Redmine
   service: name=redmine state=restarted
+
+# iptablesを再起動
+- name: Restart iptables
+  service: name=iptables state=restarted
+# firewalldを再起動
+- name: Restart firewalld
+  service: name=firewalld state=restarted

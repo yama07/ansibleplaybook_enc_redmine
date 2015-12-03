@@ -1,7 +1,7 @@
 ---
 # MySQLがインストールされている
 - name: Ensure MySQL repository is installed
-  yum: name={{ mysql_repository }} state=installed
+  yum: name={{ mysql_repository[ansible_distribution_major_version] }} state=installed
 - name: Ensure MySQL are installed
   yum: name={{ item.name }} state={{ item.state }} enablerepo={{ item.enablerepo }}
   with_items: mysql_packages
