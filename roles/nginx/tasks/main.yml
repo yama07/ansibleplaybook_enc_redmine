@@ -21,7 +21,7 @@
 
 # HTTPポート解放済み
 - name: Ensure http port is opend (iptables)
-  lineinfile: dest=/etc/sysconfig/iptables line="-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT"
+  lineinfile: dest=/etc/sysconfig/iptables insertafter='^:OUTPUT' line="-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT"
   when: is_iptables_enabled|success
   notify: Restart iptables
 - name: Ensure http port is opened (firewall-cmd)
