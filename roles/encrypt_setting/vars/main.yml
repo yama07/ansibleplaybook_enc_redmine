@@ -1,0 +1,15 @@
+---
+
+encrypt_redmine_working_bakup_dir: "/var/lib/.redmine_data/backup"
+
+encrypt_redmine_files_raw_dir: "/var/lib/.redmine_data/redmine_files/raw"
+encrypt_redmine_files_mnt_dir: "/var/lib/.redmine_data/redmine_files/mnt"
+encrypt_redmine_files_enc_mode: paranoia
+encrypt_redmine_files_password: redmineredmine
+
+
+
+encrypt_redmine_db_raw_dir: "/var/lib/.redmine_data/redmine_db/raw"
+encrypt_redmine_db_mnt_dir: "/var/lib/.redmine_data/redmine_db/mnt"
+encrypt_redmine_db_enc_mode: paranoia
+encrypt_redmine_db_password: mysqlmysql

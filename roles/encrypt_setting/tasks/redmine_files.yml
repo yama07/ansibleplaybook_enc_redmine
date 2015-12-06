@@ -1,0 +1,43 @@
+---
+# Redmineサービスが停止している
+- name: Ensure Redmine service is stopped
+  service: name=redmine state=stopped
+
+# Redmine起動ユーザがfuseグループに所属している
+- name: Ensure redmine user is a menber of fuse group
+  user: name={{ unicorn_invoking.user }} groups=fuse
+
+# Redmine 暗号化済み添付ファイルデータの保管先およびマウント先が存在している
+- name: Ensure encypted Redmine files directory and monut directory exist
+  file: path={{ item }} state=directory owner=redmine group=redmine
+  with_items:
+    - "{{ encrypt_redmine_files_raw_dir }}"
+    - "{{ encrypt_redmine_files_mnt_dir }}"
+
+# Redmine 添付ファイルデータ暗号化設定済み
+#
+# 暗号化設定が済んでいなかった場合、以下を実行
+# 1. 初期設定 & マウント
+# 2. Redmine filesディレクトリの中身をマウント先に移動
+# 3. Redmine filesにマウント先のシンボリックリンクを作成
+# 4. アンマウント
+- name: Check Redmine files directory is encrypted
+  file: path={{ encrypt_redmine_files_raw_dir }}/.encfs6.xml state=file
+  register: is_redmine_files_directory_encrypted
+  ignore_errors: true
+- name: Ensure Redmine files directory is encrypted and mounted
+  become_user: "{{ unicorn_invoking.user }}"
+  shell: >
+    echo {{ encrypt_redmine_files_password }} | /usr/local/bin/encfs --{{ encrypt_redmine_files_enc_mode }} --stdinpass {{ encrypt_redmine_files_raw_dir }} {{ encrypt_redmine_files_mnt_dir }}
+  when: is_redmine_files_directory_encrypted | failed
+- name: Ensure Redmine files directory is linked
+  become_user: "{{ unicorn_invoking.user }}"
+  shell: >
+    mv /var/lib/redmine/files {{ encrypt_redmine_files_mnt_dir }}/ &&
+    ln -s {{ encrypt_redmine_files_mnt_dir }} /var/lib/redmine/files
+  when: is_redmine_files_directory_encrypted | failed
+#- name: Ensure Redmine files directory is unmounted
+#  become_user: "{{ unicorn_invoking.user }}"
+#  shell: >
+#    fusermount -u {{ encrypt_redmine_files_mnt_dir }}
+#  when: is_redmine_files_directory_encrypted | failed

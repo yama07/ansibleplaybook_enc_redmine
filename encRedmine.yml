@@ -1,0 +1,11 @@
+---
+- hosts: redmine
+  sudo: yes
+  roles:
+    - common
+    - ruby
+    - mysql
+    - nginx
+    - redmine
+    - encfs
+    - encrypt_setting
