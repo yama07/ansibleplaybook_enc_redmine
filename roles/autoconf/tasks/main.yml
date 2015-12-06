@@ -1,0 +1,18 @@
+---
+# Autoconfソースダウンロード済み
+- name: Ensure Autoconf src exists
+  get_url: url={{ autoconf_uri }} dest={{ autoconf_src_prefix }}
+
+# Autoconfソース解凍済み
+- name: Ensure Autoconf src is unarchived
+  shell: tar xvfz autoconf-{{ autoconf_version }}.tar.gz
+  args:
+    chdir: "{{ autoconf_src_prefix }}"
+    creates: "{{ autoconf_src_prefix }}/autoconf-{{ autoconf_version }}"
+
+# Autoconfインストール済み
+- name: Ensure Autoconf is installed
+  shell: ./configure --prefix={{ autoconf_prefix }} && make && make install
+  args:
+    chdir: "{{ autoconf_src_prefix }}/autoconf-{{ autoconf_version }}"
+    creates: "{{ autoconf_prefix }}/bin/autoconf"

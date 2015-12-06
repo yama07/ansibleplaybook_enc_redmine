@@ -1,0 +1,12 @@
+---
+# Autoconfのバージョン
+autoconf_version: 2.69
+
+# Autoconfダウンロード先
+autoconf_uri: http://ftp.gnu.org/gnu/autoconf/autoconf-{{ autoconf_version }}.tar.gz
+
+# Autoconfのソース配置先
+autoconf_src_prefix: /usr/local/src
+
+# Autoconfのインストール先
+autoconf_prefix: /opt/autoconf-{{ autoconf_version }}
