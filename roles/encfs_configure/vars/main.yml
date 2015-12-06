@@ -1,0 +1,8 @@
+---
+# EncFSビルドに必要なツール
+encfs_requires_gcc_version: 4.7.2
+encfs_requires_gpp_version: 4.7.2
+encfs_requires_gettext_version: 0.19.6
+encfs_requires_autoconf_version: 2.69
+
+encfs_build_env: ""
