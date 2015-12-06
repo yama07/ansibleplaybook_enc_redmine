@@ -1,0 +1,18 @@
+---
+# Developper Toolsetのバージョン
+devtoolset_version: 1.1
+
+# Developper Toolsetレポジトリのダウンロード先
+devtoolset_repo_uri: "http://people.centos.org/tru/devtools-{{ devtoolset_version }}/devtools-{{ devtoolset_version }}.repo"
+
+# Developper Toolsetレポジトリ名
+devtoolset_repo_name: "testing-{{ devtoolset_version }}-devtools-{{ ansible_distribution_major_version }}"
+
+# インストールするツール
+devtoolset_installed_tools: {
+  gcc: "devtoolset-{{ devtoolset_version }}-gcc",
+  gpp: "devtoolset-{{ devtoolset_version }}-gcc-c++"
+}
+
+# Developper Toolsetのバイナリインストール先
+devtoolset_bin_prefix: "/opt/centos/devtoolset-{{ devtoolset_version }}/root/usr/bin"
