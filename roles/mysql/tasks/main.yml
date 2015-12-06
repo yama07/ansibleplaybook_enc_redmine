@@ -2,6 +2,8 @@
 # MySQLがインストールされている
 - name: Ensure MySQL repository is installed
   yum: name={{ mysql_repository[ansible_distribution_major_version] }} state=installed
+- name: Ensure mysql mysql-community repos are disabled
+  replace: dest=/etc/yum.repos.d/mysql-community.repo regexp="enabled=1" replace="enabled=0"
 - name: Ensure MySQL are installed
   yum: name={{ item.name }} state={{ item.state }} enablerepo={{ item.enablerepo }}
   with_items: mysql_packages
@@ -13,11 +15,11 @@
 
 # MySQLが自動起動設定済み
 - name: Ensure MySQL service is enable
-  service: name=mysql enabled=yes
+  service: name=mysqld enabled=yes
 
 # MySQLが起動済み
 - name: Ensure MySQL service is started
-  service: name=mysql state=started
+  service: name=mysqld state=started
 
 # MySQL rootユーザのパスワードが設定済み
 - name: Pre setting MySQL root password
@@ -37,9 +39,10 @@
   mysql_user: login_user=root login_password={{ mysql_root_password }}
     name='' host={{ item }} state=absent
   with_items:
+    - 127.0.0.1
+    - ::1
     - localhost
-    - "{{ inventory_hostname }}"
-    - "{{ ansible_fqdn }}"
+    - localhost.localdomain
 
 # MySQL testデータベース削除済み
 - name: Ensure MySQL test database is absent
