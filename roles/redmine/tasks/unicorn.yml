@@ -63,7 +63,7 @@
   when: (is_available_systemd|success) and (result_unicorn_unit_file_set|changed)
 - name: Ensure unicorn run-script file is registered (upstart)
   command: chkconfig --add redmine
-  when: (is_available_systemd|failed)  and (rresult_unicorn_run_script_set|changed)
+  when: (is_available_systemd|failed)  and (result_unicorn_run_script_set|changed)
 
 # Unicorn自動起動設定済み
 - name: Ensure unicorn is enable
