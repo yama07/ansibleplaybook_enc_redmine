@@ -17,3 +17,6 @@ encfs_build_tools:
   - { name: "rlog-devel",  state: latest }
   - { name: "boost",       state: latest }
   - { name: "boost-devel", state: latest }
+
+# EncFSのインストール先
+encfs_prefix: /opt/encfs-{{ encfs_version }}

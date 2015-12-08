@@ -5,5 +5,5 @@
 - include: redmine_db.yml
 
 # 起動/停止スクリプトの配置
-- name: Ensure encRedmine_ctr exists
-  template: src=encRedmine_ctl.j2 dest=/opt/encRedmine mode=700 owner=root group=root
+- name: Ensure encRedmineCtl exists
+  template: src=encRedmineCtl.j2 dest=/opt/encRedmineCtl mode=700 owner=root group=root

@@ -11,11 +11,10 @@
 # MySQLが設定済み
 - name: Ensure MySQL conf is set
   template: src=my.cnf.j2 dest=/etc/my.conf backup=yes
-  notify: Restart MySQL
 
-# MySQLが自動起動設定済み
-- name: Ensure MySQL service is enable
-  service: name=mysqld enabled=yes
+# MySQLが自動起動無効済み
+- name: Ensure MySQL service is disabled
+  service: name=mysqld enabled=no
 
 # MySQLが起動済み
 - name: Ensure MySQL service is started
@@ -48,3 +47,7 @@
 - name: Ensure MySQL test database is absent
   mysql_db: login_user=root login_password={{ mysql_root_password }}
     db=test state=absent
+
+# MySQLが停止済み
+- name: Ensure MySQL service is stopped
+  service: name=mysqld state=stopped

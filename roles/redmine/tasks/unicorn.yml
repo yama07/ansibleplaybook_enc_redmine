@@ -15,12 +15,10 @@
 # Unicorn設定ファイル配置済み
 - name: Ensure unicorn conf is set
   template: src=redmine/config/unicorn.rb.j2 dest="{{ redmine_prefix }}/config/unicorn.rb" backup=yes
-  notify: Restart Redmine
 
 # Rails設定ファイル配置済み
 - name: Ensure rails conf is set
   template: src=redmine/config.ru.j2 dest="{{ redmine_prefix }}/config.ru" backup=yes
-  notify: Restart Redmine
 
 # Unicorn起動グループ/ユーザが存在している
 - name: Ensure Unicorn invorking group exists
@@ -32,7 +30,6 @@
 # nginx用Unicorn設定ファイル配置済み
 - name: Ensure nginx-unicorn conf is set
   template: src=nginx/Redmine.conf.j2 dest={{ nginx_conf }}/conf.d/Redmine.conf
-  notify: Restart nginx
 
 # Redmineのファイル領域のオーナー/グループがUnicorn起動ユーザ/グループである
 - name: Ensure Redmine directory owner/group is unicorn invoking user/group
@@ -50,12 +47,10 @@
   template: src=init/redmine.service.j2 dest=/usr/lib/systemd/system/redmine.service
   register: result_unicorn_unit_file_set
   when: is_available_systemd|success
-  notify: Start Redmine
 - name: Ensure unicorn run-script is set (upstart)
   template: src=init/redmine.j2 dest=/etc/init.d/redmine mode=755
   register: result_unicorn_run_script_set
   when: is_available_systemd|failed
-  notify: Start Redmine
 
 # Unicorn起動スクリプト/ユニットファイル登録済み
 - name: Ensure unicorn unit-file is registered (systemd)
@@ -65,10 +60,6 @@
   command: chkconfig --add redmine
   when: (is_available_systemd|failed)  and (result_unicorn_run_script_set|changed)
 
-# Unicorn自動起動設定済み
-- name: Ensure unicorn is enable
-  service: name=redmine enabled=yes
-
-# Unicorn起動済み
-- name: Ensure unicorn is started
-  service: name=redmine state=started
+# Unicorn自動起動無効済み
+- name: Ensure unicorn is disabled
+  service: name=redmine enabled=no

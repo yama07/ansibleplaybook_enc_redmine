@@ -1,0 +1,64 @@
+#!/bin/bash
+##################################################
+#  暗号化を施したRedmineを起動/停止するスクリプト
+##################################################
+
+if [ `whoami` != "root" ]; then
+	echo "Please retry as root user."
+	exit 1
+fi
+
+encfs={{ encfs_prefix }}/bin/encfs
+redmine_user={{ unicorn_invoking.user }} 
+mysql_user=mysql
+redmine_files_raw={{ encrypt_redmine_files_raw_dir }}
+redmine_files_mnt={{ encrypt_redmine_files_mnt_dir }}
+redmine_db_raw={{ encrypt_redmine_db_raw_dir }}
+redmine_db_mnt={{ encrypt_redmine_db_mnt_dir }}
+
+start() {
+  # Redmine 添付ファイルデータのマウント
+  echo "Mounting encrypted Redmine files directory ..."
+  sudo -u ${redmine_user} ${encfs} ${redmine_files_raw} ${redmine_files_mnt}
+  # MySQL RedmineDBデータのマウント
+  echo "Mounting encrypted Redmine DB data directory ..."
+  sudo -u ${mysql_user} ${encfs} ${redmine_db_raw} ${redmine_db_mnt}
+  # MySQLを起動
+  echo "Starting MySQL ..."
+  service mysqld start
+  # Redmineを起動
+  echo "Starting Redmine ..."
+  service redmine start
+}
+
+stop() {
+  # Redmineを停止
+  echo "Stopstopping Redmine ..."
+  service redmine stop
+  # MySQLを停止
+  echo "Stopstopping MySQL ..."
+  service mysqld stop
+  # MySQL RedmineDBデータのアンマウント
+  echo "Unmounting encrypted Redmine DB data directory ..."
+  sudo -u ${mysql_user} fusermount -u ${redmine_db_mnt}
+  # Redmine 添付ファイルデータのアンマウント
+  echo "Unmounting encrypted Redmine files directory ..."
+  sudo -u ${redmine_user} fusermount -u ${redmine_files_mnt}
+}
+
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo $"Usage: $prog {start|stop|restart}"
+        exit 1
+esac

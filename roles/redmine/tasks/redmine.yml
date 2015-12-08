@@ -16,6 +16,10 @@
     chdir: "{{ redmine_src_prefix }}"
     creates: "{{ redmine_prefix }}"
 
+# MySQLが起動済み
+- name: Ensure MySQL service is started
+  service: name=mysqld state=started
+
 # Redmineデータベースが存在している
 - name: Redmine database exists
   mysql_db: login_user=root login_password={{ mysql_root_password }}
@@ -63,3 +67,7 @@
   args:
     chdir: "{{ redmine_prefix }}"
   when: result_gem_packages_install | changed
+
+# MySQLが停止済み
+- name: Ensure MySQL service is stopped
+  service: name=mysqld state=stopped

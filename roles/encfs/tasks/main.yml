@@ -17,7 +17,10 @@
 
 # EncFSインストール済み
 - name: Ensure EncFS is installed
-  shell: "{{ encfs_build_env }} autoreconf -if && {{ encfs_build_env }} ./configure && make && make install"
+  shell: >
+    {{ encfs_build_env }} autoreconf -if &&
+    {{ encfs_build_env }} ./configure --prefix={{ encfs_prefix }} &&
+    make && make install
   args:
     chdir: "{{ encfs_src_prefix }}/encfs-{{ encfs_version }}"
     creates: /usr/local/bin/encfs
