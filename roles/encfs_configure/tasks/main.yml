@@ -20,7 +20,7 @@
     msg: "gcc v{{ installed_gcc_version }} is installed. EncFs requires v{{ encfs_requires_gcc_version }} or higher"
 
 # gccのインストールが必要かどうかチェック
-- name: Check check whether to install gcc
+- name: Check whether to install gcc
   set_fact: encfs_is_required_gcc_install={{ installed_gcc_version | version_compare(encfs_requires_gcc_version, '<') }}
 
 # 環境変数CCをセット

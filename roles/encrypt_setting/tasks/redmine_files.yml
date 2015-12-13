@@ -28,16 +28,16 @@
 - name: Ensure Redmine files directory is encrypted and mounted
   become_user: "{{ unicorn_invoking.user }}"
   shell: >
-    echo {{ encrypt_redmine_files_password }} | /usr/local/bin/encfs --{{ encrypt_redmine_files_enc_mode }} --stdinpass {{ encrypt_redmine_files_raw_dir }} {{ encrypt_redmine_files_mnt_dir }}
+    echo {{ encrypt_redmine_files_password }} | {{ encfs_prefix }}/bin/encfs --{{ encrypt_redmine_files_enc_mode }} --stdinpass {{ encrypt_redmine_files_raw_dir }} {{ encrypt_redmine_files_mnt_dir }}
   when: is_redmine_files_directory_encrypted | failed
 - name: Ensure Redmine files directory is linked
   become_user: "{{ unicorn_invoking.user }}"
   shell: >
-    mv /var/lib/redmine/files {{ encrypt_redmine_files_mnt_dir }}/ &&
+    mv /var/lib/redmine/files/* {{ encrypt_redmine_files_mnt_dir }}/ &&
     ln -s {{ encrypt_redmine_files_mnt_dir }} /var/lib/redmine/files
   when: is_redmine_files_directory_encrypted | failed
-#- name: Ensure Redmine files directory is unmounted
-#  become_user: "{{ unicorn_invoking.user }}"
-#  shell: >
-#    fusermount -u {{ encrypt_redmine_files_mnt_dir }}
-#  when: is_redmine_files_directory_encrypted | failed
+- name: Ensure Redmine files directory is unmounted
+  become_user: "{{ unicorn_invoking.user }}"
+  shell: >
+    fusermount -u {{ encrypt_redmine_files_mnt_dir }}
+  when: is_redmine_files_directory_encrypted | failed

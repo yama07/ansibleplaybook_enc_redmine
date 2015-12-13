@@ -5,13 +5,9 @@
 - name: Ensure nginx is installed
   yum: name=nginx state=latest
 
-# nginxが自動起動設定済み
-- name: Ensure nginx service is enable
-  service: name=nginx enabled=yes
-
-# nginxが起動済み
-- name: Ensure nginx service is started
-  service: name=nginx state=started
+# nginxが自動起動無効済み
+- name: Ensure nginx service is disanabled
+  service: name=nginx enabled=no
 
 # iptablesが利用可能かどうかチェック
 - name: Check iptables is enabled

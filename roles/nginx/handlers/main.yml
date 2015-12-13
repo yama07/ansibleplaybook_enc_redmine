@@ -6,3 +6,11 @@
 # nginxを再起動
 - name: Restart nginx
   service: name=nginx state=restarted
+
+# iptablesを再起動
+- name: Restart iptables
+  service: name=iptables state=restarted
+
+# firewalldを再起動
+- name: Restart firewalld
+  service: name=firewalld state=restarted

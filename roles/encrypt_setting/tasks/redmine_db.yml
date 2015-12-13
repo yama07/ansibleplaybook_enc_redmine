@@ -28,7 +28,7 @@
 - name: Ensure Redmine DB files are encrypted and mounted
   become_user: mysql
   shell: >
-    echo {{ encrypt_redmine_db_password }} | /usr/local/bin/encfs --{{ encrypt_redmine_db_enc_mode }} --stdinpass {{ encrypt_redmine_db_raw_dir }} {{ encrypt_redmine_db_mnt_dir }}
+    echo {{ encrypt_redmine_db_password }} | {{ encfs_prefix }}/bin/encfs --{{ encrypt_redmine_db_enc_mode }} --stdinpass {{ encrypt_redmine_db_raw_dir }} {{ encrypt_redmine_db_mnt_dir }}
   when: are_redmine_db_files_encrypted | failed
 - name: Ensure Redmine DB files are linked
   become_user: mysql
@@ -41,9 +41,9 @@
     - "ib_logfile1"
     - "ibdata1"
   when: are_redmine_db_files_encrypted | failed
-#- name: Ensure Redmine DB files are unmounted
-#  become_user: mysql
-#  shell: >
-#    fusermount -u {{ encrypt_redmine_db_mnt_dir }}
-#  when: are_redmine_db_files_encrypted | failed
+- name: Ensure Redmine DB files are unmounted
+  become_user: mysql
+  shell: >
+    fusermount -u {{ encrypt_redmine_db_mnt_dir }}
+  when: are_redmine_db_files_encrypted | failed
 

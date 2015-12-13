@@ -5,5 +5,8 @@
 - include: redmine_db.yml
 
 # 起動/停止スクリプトの配置
+- name: Ensure encRedmine command prefix directory exists
+  file: path={{ encrypt_command_prefix }} state=directory
 - name: Ensure encRedmineCtl exists
-  template: src=encRedmineCtl.j2 dest=/opt/encRedmineCtl mode=700 owner=root group=root
+  template: src=encRedmineCtl.j2 dest={{encrypt_command_prefix}}/encRedmineCtl
+    mode=700 owner=root group=root
