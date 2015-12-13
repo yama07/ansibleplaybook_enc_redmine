@@ -1,0 +1,25 @@
+---
+# rbenvのインストール先
+ruby_rbenv_prefix: /opt/rbenv
+
+# rbenvのダウンロード先情報
+ruby_rbenv: {
+  uri: 'https://github.com/sstephenson/rbenv.git',
+  version: "master"
+}
+
+# rubybuild pluginのダウンロード先情報
+ruby_rbenv_rubybuild_plugin: {
+  uri: 'https://github.com/sstephenson/ruby-build.git',
+  version: "master"
+}
+
+# Rubyのバージョン
+ruby_version: 2.2.2
+
+# Rubyビルドに必要なツール
+ruby_build_tools:
+  - { name: "openssl-devel",      state: latest }
+  - { name: "readline-devel",     state: latest }
+  - { name: "zlib-devel",         state: latest }
+  - { name: "curl-devel",         state: latest }

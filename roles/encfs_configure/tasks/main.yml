@@ -1,0 +1,127 @@
+---
+#######################################
+#  gcc
+#######################################
+
+# gccのバージョンをチェック
+- name: Check gcc version
+  shell: gcc --version | grep "gcc (GCC)" | cut -d" " -f3
+  register: result_installed_gcc_version_check
+  ignore_errors: true
+  changed_when: false
+
+# gccのバージョンをセット
+# 未インストールの場合やバージョンを取得できなかった場合は0.0にセット
+- set_fact: installed_gcc_version={{ result_installed_gcc_version_check.stdout }}
+- set_fact: installed_gcc_version="0.0"
+  when: result_installed_gcc_version_check.stdout == ""
+
+- debug:
+    msg: "gcc v{{ installed_gcc_version }} is installed. EncFs requires v{{ encfs_requires_gcc_version }} or higher"
+
+# gccのインストールが必要かどうかチェック
+- name: Check whether to install gcc
+  set_fact: encfs_is_required_gcc_install={{ installed_gcc_version | version_compare(encfs_requires_gcc_version, '<') }}
+
+# 環境変数CCをセット
+- name: Set CC environment variable
+  set_fact: encfs_build_env="{{ encfs_build_env }} CC={{ devtoolset_bin_prefix }}/gcc"
+  when: encfs_is_required_gcc_install
+
+#######################################
+#  g++
+#######################################
+
+# g++のバージョンをチェック
+- name: Check g++ version
+  shell: g++ --version | grep "g++ (GCC)" | cut -d" " -f3
+  register: result_installed_gpp_version_check
+  ignore_errors: true
+  changed_when: false
+
+# g++のバージョンをセット
+# 未インストールの場合やバージョンを取得できなかった場合は0.0にセット
+- set_fact: installed_gpp_version={{ result_installed_gpp_version_check.stdout }}
+- set_fact: installed_gpp_version="0.0"
+  when: result_installed_gpp_version_check.stdout == ""
+
+- debug:
+    msg: "g++ v{{ installed_gpp_version }} is installed. EncFs requires v{{ encfs_requires_gpp_version }} or higher."
+
+# g++のインストールが必要かどうかチェック
+- name: Check check whether to install g++
+  set_fact: encfs_is_required_gpp_install={{ installed_gpp_version | version_compare(encfs_requires_gpp_version, '<') }}
+
+# 環境変数CXXをセット
+- name: Set CXX environment variable
+  set_fact: encfs_build_env="{{ encfs_build_env }} CXX={{ devtoolset_bin_prefix }}/g++"
+  when: encfs_is_required_gpp_install
+
+#######################################
+#  gettext
+#######################################
+
+# gettextのバージョンをチェック
+- name: Check gettext version
+  shell: gettext --version | grep "gettext (GNU gettext-runtime)" | cut -d' ' -f4
+  register: result_installed_gettext_version_check
+  ignore_errors: true
+  changed_when: false
+
+# gettextのバージョンをセット
+# 未インストールの場合やバージョンを取得できなかった場合は0.0にセット
+- set_fact: installed_gettext_version={{ result_installed_gettext_version_check.stdout }}
+- set_fact: installed_gettext_version="0.0"
+  when: result_installed_gettext_version_check.stdout == ""
+
+- debug:
+    msg: "gettext v{{ installed_gettext_version }} is installed. EncFs requires v{{ encfs_requires_gettext_version }} or higher."
+
+# gettextのインストールが必要かどうかチェック
+- name: Check check whether to install gettext
+  set_fact: encfs_is_required_gettext_install={{ installed_gettext_version | version_compare(encfs_requires_gettext_version, '<') }}
+
+# 環境変数AUTOPOINTをセット
+- name: Set AUTOPOINT environment variable
+  set_fact: encfs_build_env="{{ encfs_build_env }} AUTOPOINT={{ gettext_prefix }}/bin/autopoint"
+  when: encfs_is_required_gettext_install
+
+# 環境変数CFLAGSをセット
+- name: Set CFLAGS environment variable
+  set_fact: encfs_build_env="{{ encfs_build_env }} CFLAGS=-I{{ gettext_prefix }}/include"
+  when: encfs_is_required_gettext_install
+
+# 環境変数LDFLAGSをセット
+- name: Set LDFLAGS environment variable
+  set_fact: encfs_build_env="{{ encfs_build_env }} LDFLAGS=-L{{ gettext_prefix }}/lib"
+  when: encfs_is_required_gettext_install
+
+
+#######################################
+#  Autoconf
+#######################################
+
+# Autoconfのバージョンをチェック
+- name: Check Autoconf version
+  shell: autoconf --version | grep "autoconf (GNU Autoconf)" | cut -d' ' -f4
+  register: result_installed_autoconf_version_check
+  ignore_errors: true
+  changed_when: false
+
+# Autoconfのバージョンをセット
+# 未インストールの場合やバージョンを取得できなかった場合は0.0にセット
+- set_fact: installed_autoconf_version={{ result_installed_autoconf_version_check.stdout }}
+- set_fact: installed_autoconf_version="0.0"
+  when: result_installed_autoconf_version_check.stdout == ""
+
+- debug:
+    msg: "autoconf v{{ installed_autoconf_version }} is installed. EncFs requires v{{ encfs_requires_autoconf_version }} or higher."
+
+# Autoconfのインストールが必要かどうかチェック
+- name: Check check whether to install Autoconf
+  set_fact: encfs_is_required_autoconf_install={{ installed_autoconf_version | version_compare(encfs_requires_autoconf_version, '<') }}
+
+# 環境変数PATHをセット
+- name: Set PATH environment variable
+  set_fact: encfs_build_env="{{ encfs_build_env }} PATH={{ autoconf_prefix }}/bin:{{ ansible_env.PATH }}"
+  when: encfs_is_required_autoconf_install

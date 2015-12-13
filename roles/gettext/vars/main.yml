@@ -1,0 +1,12 @@
+---
+# gettextのバージョン
+gettext_version: 0.19.6
+
+# gettextダウンロード先
+gettext_uri: http://ftp.gnu.org/pub/gnu/gettext/gettext-{{ gettext_version }}.tar.gz
+
+# gettextのソース配置先
+gettext_src_prefix: /usr/local/src
+
+# gettextのインストール先
+gettext_prefix: /opt/gettext-{{ gettext_version }}

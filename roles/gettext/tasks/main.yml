@@ -1,0 +1,18 @@
+---
+# gettextソースダウンロード済み
+- name: Ensure gettext src exist
+  get_url: url={{ gettext_uri }} dest={{ gettext_src_prefix }}
+
+# gettextソース解凍済み
+- name: Ensure gettext src is unarchived
+  shell: tar xvfz gettext-{{ gettext_version }}.tar.gz
+  args:
+    chdir: "{{ gettext_src_prefix }}"
+    creates: "{{ gettext_src_prefix }}/gettext-{{ gettext_version }}"
+
+# gettextインストール済み
+- name: Ensure gettext is installed
+  shell: ./configure --prefix={{ gettext_prefix }} && make && make install
+  args:
+    chdir: "{{ gettext_src_prefix }}/gettext-{{ gettext_version }}"
+    creates: "{{ gettext_prefix }}/bin/gettext"

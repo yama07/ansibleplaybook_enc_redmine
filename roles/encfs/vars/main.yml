@@ -1,0 +1,22 @@
+---
+# EncFSのバージョン
+encfs_version: 1.8.1
+
+# EncFSダウンロード先
+encfs_uri: http://github.com/vgough/encfs/archive/v{{ encfs_version }}.tar.gz
+
+# EncFSのソース配置先
+encfs_src_prefix: /usr/local/src
+
+# EncFSビルドに必要なツール
+encfs_build_tools:
+  - { name: "fuse",        state: latest }
+  - { name: "fuse-devel",  state: latest }
+  - { name: "fuse-libs",   state: latest }
+  - { name: "rlog",        state: latest }
+  - { name: "rlog-devel",  state: latest }
+  - { name: "boost",       state: latest }
+  - { name: "boost-devel", state: latest }
+
+# EncFSのインストール先
+encfs_prefix: /opt/encfs-{{ encfs_version }}

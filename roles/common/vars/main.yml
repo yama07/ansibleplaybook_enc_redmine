@@ -1,0 +1,9 @@
+---
+# 共通で使用するツール
+common_tools:
+  - { name: "@Development tools", state: latest }
+
+common_epel_repository: {
+  "6": "http://ftp.iij.ad.jp/pub/linux/fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm",
+  "7": "http://ftp.iij.ad.jp/pub/linux/fedora/epel/7/x86_64/e/epel-release-7-5.noarch.rpm"
+}

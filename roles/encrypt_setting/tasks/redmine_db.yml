@@ -1,0 +1,49 @@
+---
+# MySQLサービスが停止している
+- name: Ensure MySQL service is stopped
+  service: name=mysqld state=stopped
+
+# MySQL起動ユーザがfuseグループに所属している
+- name: Ensure mysql user is a menber of fuse group
+  user: name=mysql groups=fuse
+
+# MySQL 暗号化済みRedmineDBデータの保管先およびマウント先が存在している
+- name: Ensure encrypted Redmine DB data directory and mount directory exist
+  file: path={{ item }} state=directory owner=mysql group=mysql
+  with_items:
+    - "{{ encrypt_redmine_db_raw_dir }}"
+    - "{{ encrypt_redmine_db_mnt_dir }}"
+
+# MySQL RedmineDBデータ暗号化設定済み
+#
+# 暗号化設定が済んでいなかった場合、以下を実行
+# 1. 初期設定 & マウント
+# 2. RedmineDBディレクトリの中身をマウント先に移動
+# 4. RedmineDBディレクトリにマウント先のシンボリックリンクを作成
+# 5. アンマウント
+- name: Check Redmine DB files are encrypted
+  file: path={{ encrypt_redmine_db_raw_dir }}/.encfs6.xml state=file
+  register: are_redmine_db_files_encrypted
+  ignore_errors: true
+- name: Ensure Redmine DB files are encrypted and mounted
+  become_user: mysql
+  shell: >
+    echo {{ encrypt_redmine_db_password }} | {{ encfs_prefix }}/bin/encfs --{{ encrypt_redmine_db_enc_mode }} --stdinpass {{ encrypt_redmine_db_raw_dir }} {{ encrypt_redmine_db_mnt_dir }}
+  when: are_redmine_db_files_encrypted | failed
+- name: Ensure Redmine DB files are linked
+  become_user: mysql
+  shell: >
+    mv {{ mysql_data_dir }}/{{ item }} {{ encrypt_redmine_db_mnt_dir }}/{{ item }} &&
+    ln -s {{ encrypt_redmine_db_mnt_dir }}/{{ item }} {{ mysql_data_dir }}/{{ item }}
+  with_items:
+    - "db_redmine"
+    - "ib_logfile0"
+    - "ib_logfile1"
+    - "ibdata1"
+  when: are_redmine_db_files_encrypted | failed
+- name: Ensure Redmine DB files are unmounted
+  become_user: mysql
+  shell: >
+    fusermount -u {{ encrypt_redmine_db_mnt_dir }}
+  when: are_redmine_db_files_encrypted | failed
+

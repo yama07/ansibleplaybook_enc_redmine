@@ -1,0 +1,35 @@
+---
+###################################
+##     Redmine 添付ファイル
+###################################
+
+# Redmine 添付ファイルデータの暗号化ソースディレクトリ
+encrypt_redmine_files_raw_dir: "/var/lib/.redmine_data/files/raw"
+# Redmine 添付ファイルデータの暗号化マウントディレクトリ
+encrypt_redmine_files_mnt_dir: "/var/lib/.redmine_data/files/mnt"
+# Redmine 添付ファイルデータの暗号化モード(standard or paranoia)
+encrypt_redmine_files_enc_mode: paranoia
+# Redmine 添付ファイルデータの暗号パスワード
+encrypt_redmine_files_password: redmineredmine
+
+
+###################################
+##     Redmine DBデータ
+###################################
+
+# MySQL RedmineDBデータ暗号化ソースディレクトリ
+encrypt_redmine_db_raw_dir: "/var/lib/.redmine_data/db/raw"
+# MySQL RedmineDBデータ暗号化マウントディレクトリ
+encrypt_redmine_db_mnt_dir: "/var/lib/.redmine_data/db/mnt"
+# MySQL RedmineDBデータ暗号化モード(standard or paranoia)
+encrypt_redmine_db_enc_mode: paranoia
+# MySQL RedmineDBデータ暗号パスワード
+encrypt_redmine_db_password: mysqlmysql
+
+
+###################################
+##     Rencedmine コマンドスクリプト
+###################################
+
+# encRedmineのコマンドスクリプトを配置するディレクトリ
+encrypt_command_prefix: "/opt/encRedmine/bin"

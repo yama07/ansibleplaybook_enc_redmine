@@ -1,0 +1,14 @@
+---
+# Developper Toolsetレポジトリ追加済み
+- name: Ensure devtoolset repo exist
+  get_url: url={{ devtoolset_repo_uri }} dest="/etc/yum.repos.d"
+
+# gccインストール済み
+- name: Ensure gcc is installed
+  yum: name={{ devtoolset_installed_tools.gcc }} enablerepo={{ devtoolset_repo_name }}
+  when: "{{ install_gcc | default(true) }}"
+
+# g++インストール済み
+- name: Ensure g++ is installed
+  yum: name={{ devtoolset_installed_tools.gpp }} enablerepo={{ devtoolset_repo_name }}
+  when: "{{ install_gpp | default(true) }}"

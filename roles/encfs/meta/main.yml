@@ -1,0 +1,9 @@
+---
+dependencies:
+  - { role: encfs_configure }
+  - { role: gettext,  	when: encfs_is_required_gettext_install  }
+  - { role: autoconf,  	when: encfs_is_required_autoconf_install }
+  - { role: devtoolset, when: encfs_is_required_gcc_install or encfs_is_required_gpp_install,
+      install_gcc: encfs_is_required_gcc_install,
+      install_gpp: encfs_is_required_gpp_install
+    }

@@ -1,0 +1,17 @@
+---
+# MySQLレポジトリ
+mysql_repository: {
+  "6": "http://dev.mysql.com/get/mysql57-community-release-el6-7.noarch.rpm",
+  "7": "http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm"
+}
+# インストールするMySQLパッケージ
+mysql_packages:
+  - { name: "mysql-community-devel-5.6.*",  state: "latest", enablerepo: "mysql56-community" }
+  - { name: "mysql-community-server-5.6.*", state: "latest", enablerepo: "mysql56-community" }
+  - { name: "MySQL-python",                 state: "latest", enablerepo: "base"              }
+
+# MySQL rootユーザのパスワード
+mysql_root_password: rootroot
+
+# MySQL DBディレクトリ
+mysql_data_dir: "/var/lib/mysql"

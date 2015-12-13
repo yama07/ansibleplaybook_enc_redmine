@@ -1,0 +1,177 @@
+#!/bin/bash
+##################################################
+#  暗号化を施したRedmineを起動/停止するスクリプト
+##################################################
+
+if [ `whoami` != "root" ]; then
+	echo "Please retry as root user."
+	exit 1
+fi
+
+encfs={{ encfs_prefix }}/bin/encfs
+
+redmine_user={{ unicorn_invoking.user }} 
+mysql_user=mysql
+
+redmine_files_raw={{ encrypt_redmine_files_raw_dir }}
+redmine_files_mnt={{ encrypt_redmine_files_mnt_dir }}
+redmine_db_raw={{ encrypt_redmine_db_raw_dir }}
+redmine_db_mnt={{ encrypt_redmine_db_mnt_dir }}
+
+redmine_pidfile={{ redmine_prefix }}/tmp/pids/unicorn.pid
+mysql_pidfile=/var/run/mysqld/mysqld.pid
+nginx_pidfile=/var/run/nginx.pid
+
+# 文字色付きecho
+redEcho()    { echo -e "\e[31m$*\e[m"; }
+greenEcho()  { echo -e "\e[32m$*\e[m"; }
+yellowEcho() { echo -e "\e[33m$*\e[m"; }
+
+
+# 暗号化データの状態確認/マウント/アンマウント
+encData() {
+  op="$1"
+  dataName="$2"
+  mntUser="$3"
+  rawDir="$4"
+  mntDir="$5"
+
+  ( mount | grep "${mntDir}" ) > /dev/null 2>&1
+  STATUS=$?
+  case "${op}" in
+    status)
+        echo -n -e "- Encrypted ${dataName} \t: "
+        [ $STATUS -eq 0 ] && greenEcho "mounted" || yellowEcho "not mounted"
+        return 0
+        ;;
+    mount)
+        [ $STATUS -eq 0 ] && return 0
+        echo "< Mounting encrypted ${dataName} directory ... >"
+        sudo -u ${mntUser} ${encfs} ${rawDir} ${mntDir}
+        ;;
+    unmount)
+        [ $STATUS -ne 0 ] && return 0
+        echo "< Unmounting encrypted ${dataName} directory ... >"
+        sudo -u ${mntUser} fusermount -u ${mntDir}
+        ;;
+  esac
+  RETVAL=$?
+  [ $RETVAL -eq 0 ] && greenEcho "Success" || redEcho "Failure"
+  return $RETVAL
+}
+# Redmine 添付ファイルデータの状態確認/マウント/アンマウント
+RedmineFiles() {
+  encData $1 "Redmine files"   ${redmine_user} ${redmine_files_raw} ${redmine_files_mnt}
+}
+# MySQL RedmineDBデータの状態確認/マウント/アンマウント
+RedmineDB() {
+  encData $1 "Redmine DB data" ${mysql_user}   ${redmine_db_raw}    ${redmine_db_mnt}
+}
+
+
+# サービスの状態確認/起動/停止
+encService() {
+  op=$1
+  serviceName=$2
+  daemonName=$3
+  pidfile=$4
+
+  [ -e $pidfile ] && kill -0 `cat $pidfile` > /dev/null 2>&1
+  STATUS=$?
+  case "$op" in
+    status)
+        echo -n -e "- $serviceName \t: "
+        [ $STATUS -eq 0 ] && greenEcho "running" || yellowEcho "not running"
+        return 0
+        ;;
+    start)
+        [ $STATUS -eq 0 ] && return 0
+        echo "< Starting $serviceName ... >"
+        service $daemonName start
+        ;;
+    stop)
+        [ $STATUS -ne 0 ] && return 0
+        echo "< Stopping $serviceName ... >"
+        service $daemonName stop
+        ;;
+  esac
+  RETVAL=$?
+  [ $RETVAL -eq 0 ] && greenEcho "Success" || redEcho "Failure"
+  return $RETVAL
+}
+# MySQLの状態確認/起動/停止
+MySQL() {
+  encService $1 "MySQL"   "mysqld"  ${mysql_pidfile}
+}
+# Redmineの状態確認/起動/停止
+Redmine() {
+  encService $1 "Redmine" "redmine" ${redmine_pidfile}
+}
+# nginxの状態確認/起動/停止
+Nginx() {
+  encService $1 "nginx"   "nginx"   ${nginx_pidfile}
+}
+
+
+
+start() {
+  RedmineFiles mount
+  [ $? -ne 0 ] && { stop; exit $RETVAL; }
+
+  RedmineDB    mount
+  [ $? -ne 0 ] && { stop; exit $RETVAL; }
+
+  MySQL        start
+  [ $? -ne 0 ] && { stop; exit $RETVAL; }
+
+  Redmine      start
+  [ $? -ne 0 ] && { stop; exit $RETVAL; }
+
+  Nginx        start
+  [ $? -ne 0 ] && { stop; exit $RETVAL; }
+}
+
+stop() {
+  Nginx        stop
+  Redmine      stop
+  MySQL        stop
+  RedmineDB    unmount
+  RedmineFiles unmount
+}
+
+restart() {
+  stop
+  start
+}
+
+status() {
+  echo "#################################################"
+  echo "encRedmine components"
+  Nginx        status
+  Redmine      status
+  MySQL        status
+  RedmineDB    status
+  RedmineFiles status
+  echo "#################################################"
+}
+
+case "$1" in
+    start)
+        status
+        start
+        ;;
+    stop)
+        status
+        stop
+        ;;
+    restart)
+        status
+        restart
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo $"Usage: $prog {start|stop|restart|status}"
+        exit 1
+esac
