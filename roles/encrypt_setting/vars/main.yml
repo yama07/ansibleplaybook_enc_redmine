@@ -33,3 +33,5 @@ encrypt_redmine_db_password: mysqlmysql
 
 # encRedmineのコマンドスクリプトを配置するディレクトリ
 encrypt_command_prefix: "/opt/encRedmine/bin"
+# encRedmineのログを配置するディレクトリ
+encrypt_log_prefix: "/opt/encRedmine/log"

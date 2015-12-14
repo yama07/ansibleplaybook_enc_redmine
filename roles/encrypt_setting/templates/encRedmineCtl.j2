@@ -9,6 +9,7 @@ if [ `whoami` != "root" ]; then
 fi
 
 encfs={{ encfs_prefix }}/bin/encfs
+logfile={{ encrypt_log_prefix }}/encRedmineCtl_log
 
 redmine_user={{ unicorn_invoking.user }} 
 mysql_user=mysql
@@ -17,6 +18,9 @@ redmine_files_raw={{ encrypt_redmine_files_raw_dir }}
 redmine_files_mnt={{ encrypt_redmine_files_mnt_dir }}
 redmine_db_raw={{ encrypt_redmine_db_raw_dir }}
 redmine_db_mnt={{ encrypt_redmine_db_mnt_dir }}
+
+redmine_files_enc_passwd={{ encrypt_redmine_files_password }}
+redmine_db_enc_passwd={{ encrypt_redmine_db_password }}
 
 redmine_pidfile={{ redmine_prefix }}/tmp/pids/unicorn.pid
 mysql_pidfile=/var/run/mysqld/mysqld.pid
@@ -35,6 +39,7 @@ encData() {
   mntUser="$3"
   rawDir="$4"
   mntDir="$5"
+  encPasswd="$6"
 
   ( mount | grep "${mntDir}" ) > /dev/null 2>&1
   STATUS=$?
@@ -47,7 +52,7 @@ encData() {
     mount)
         [ $STATUS -eq 0 ] && return 0
         echo "< Mounting encrypted ${dataName} directory ... >"
-        sudo -u ${mntUser} ${encfs} ${rawDir} ${mntDir}
+        echo ${encPasswd} | sudo -u ${mntUser} ${encfs} --stdinpass ${rawDir} ${mntDir}
         ;;
     unmount)
         [ $STATUS -ne 0 ] && return 0
@@ -61,11 +66,11 @@ encData() {
 }
 # Redmine 添付ファイルデータの状態確認/マウント/アンマウント
 RedmineFiles() {
-  encData $1 "Redmine files"   ${redmine_user} ${redmine_files_raw} ${redmine_files_mnt}
+  encData $1 "Redmine files"   ${redmine_user} ${redmine_files_raw} ${redmine_files_mnt} ${redmine_files_enc_passwd}
 }
 # MySQL RedmineDBデータの状態確認/マウント/アンマウント
 RedmineDB() {
-  encData $1 "Redmine DB data" ${mysql_user}   ${redmine_db_raw}    ${redmine_db_mnt}
+  encData $1 "Redmine DB data" ${mysql_user}   ${redmine_db_raw}    ${redmine_db_mnt}    ${redmine_db_enc_passwd}
 }
 
 
@@ -155,23 +160,24 @@ status() {
   echo "#################################################"
 }
 
-case "$1" in
-    start)
-        status
-        start
-        ;;
-    stop)
-        status
-        stop
-        ;;
-    restart)
-        status
-        restart
-        ;;
-    status)
-        status
-        ;;
-    *)
-        echo $"Usage: $prog {start|stop|restart|status}"
-        exit 1
-esac
+main() {
+  case "$1" in
+      start)
+          start
+          ;;
+      stop)
+          stop
+          ;;
+      restart)
+          restart
+          ;;
+      status)
+          status
+          ;;
+      *)
+          echo $"Usage: $prog {start|stop|restart|status}"
+          exit 1
+  esac
+}
+
+main "$1"  | awk '{ print strftime("[%Y/%m/%d %H:%M:%S]"), $0 }' | tee -a ${logfile} | cut -d' ' -f3-

@@ -4,9 +4,14 @@
 # MySQL RedmineDBデータの暗号化
 - include: redmine_db.yml
 
-# 起動/停止スクリプトの配置
+
+# encRedmineのコマンドディレクトリが存在している
 - name: Ensure encRedmine command prefix directory exists
   file: path={{ encrypt_command_prefix }} state=directory
+# encRedmineのログディレクトリが存在している
+- name: Ensure encRedmine log prefix directory exists
+  file: path={{ encrypt_log_prefix }} state=directory
+# 起動/停止スクリプトが配置済み
 - name: Ensure encRedmineCtl exists
   template: src=encRedmineCtl.j2 dest={{encrypt_command_prefix}}/encRedmineCtl
     mode=700 owner=root group=root
