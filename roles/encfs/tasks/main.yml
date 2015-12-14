@@ -4,6 +4,17 @@
   yum: name={{ item.name }} state={{ item.state }}
   with_items: encfs_build_tools
 
+# fuseモジュールがロードされているかチェック
+- name: Check fuse module is loaded
+  shell: lsmod | grep fuse
+  register: is_fuse_module_loaded
+  ignore_errors: yes
+
+# fuseモジュールロード済み
+- name: Ensure fuse module is loaded
+  shell: modprobe fuse
+  when: is_fuse_module_loaded|failed
+
 # EncFSソースダウンロード済み
 - name: Ensure EncFS src exist
   get_url: url={{ encfs_uri }} dest={{ encfs_src_prefix }}

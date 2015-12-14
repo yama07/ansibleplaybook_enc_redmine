@@ -6,6 +6,7 @@
 # MySQL起動ユーザがfuseグループに所属している
 - name: Ensure mysql user is a menber of fuse group
   user: name=mysql groups=fuse
+  ignore_errors: yes
 
 # MySQL 暗号化済みRedmineDBデータの保管先およびマウント先が存在している
 - name: Ensure encrypted Redmine DB data directory and mount directory exist
